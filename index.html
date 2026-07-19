@@ -115,13 +115,15 @@
     transition:opacity .28s ease, transform .28s ease;
   }
   .cycle-word.cw-out{opacity:0;transform:translateY(8px);}
-  .run-word{display:inline-block;transition:color .1s ease;}
+  .run-word{display:inline-block;line-height:1.2;transition:color .1s ease;}
   .run-word.settled{
     color:var(--folder-green);
     text-transform:uppercase;
     font-family:'Permanent Marker', cursive;
     font-weight:400;
     letter-spacing:.02em;
+    line-height:0.85;
+    vertical-align:baseline;
   }
   .run-word.write-in{
     animation:writeReveal .9s ease forwards;
@@ -194,6 +196,21 @@
   .section-eyebrow{margin-bottom:16px;}
   .section-title{font-family:var(--display);font-size:clamp(26px,3.4vw,36px);font-weight:600;letter-spacing:-.01em;}
   .section-title em{font-style:italic;color:var(--tab-red);font-weight:500;}
+
+  /* --- screenshot showcase --- */
+  .screens-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:36px;max-width:640px;margin:0 auto;}
+  @media (max-width:620px){.screens-grid{grid-template-columns:1fr;max-width:320px;}}
+  .screen-card{text-align:center;}
+  .screen-frame{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 24px 46px -22px rgba(34,49,74,.22);
+    margin-bottom:16px;
+  }
+  .screen-frame img{display:block;width:100%;height:auto;}
+  .screen-caption{font-size:13.5px;color:var(--ink-soft);max-width:260px;margin:0 auto;line-height:1.5;}
 
   /* --- feature grid --- */
   .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);}
@@ -321,6 +338,25 @@
     <div class="outcome-item"><div class="outcome-label">Lighter admin load</div><div class="outcome-desc">Registration, fees, and waivers run themselves in the background.</div></div>
     <div class="outcome-item"><div class="outcome-label">Clearer communication</div><div class="outcome-desc">One portal, one inbox, one source of truth for every family.</div></div>
     <div class="outcome-item"><div class="outcome-label">More time saved</div><div class="outcome-desc">The parts that used to take a weekend now take an afternoon.</div></div>
+  </div>
+</section>
+
+<section class="section" id="screens" style="padding-top:60px;">
+  <div class="wrap">
+    <div class="section-head" style="margin:0 auto 44px;text-align:center;">
+      <div class="section-eyebrow" style="display:flex;justify-content:center;"><span class="tab tab-outline">The parent portal</span></div>
+      <h2 class="section-title">What families actually <em>see.</em></h2>
+    </div>
+    <div class="screens-grid">
+      <div class="screen-card">
+        <div class="screen-frame"><img src="images/parent-portal-dashboard.png" alt="Parent portal dashboard showing badges earned, cleaning duties, days to co-op, class signup countdown, and assignments"></div>
+        <p class="screen-caption">Badges, cleaning duties, and the countdown to the next deadline — all on one screen when a parent logs in.</p>
+      </div>
+      <div class="screen-card">
+        <div class="screen-frame"><img src="images/parent-portal-classes.png" alt="Parent portal class list showing a child's schedule, periods, and attendance"></div>
+        <p class="screen-caption">Every child's schedule and attendance streak, with a drop-class option right where parents look for it.</p>
+      </div>
+    </div>
   </div>
 </section>
 
