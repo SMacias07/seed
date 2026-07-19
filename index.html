@@ -1,9 +1,578 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>My Site</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seed Scheduler — Homeschool Co-op Management</title>
+<meta name="description" content="Everything a homeschool co-op needs to run registration, classes, volunteers, attendance, and parent communication in one place.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,72,400;0,72,500;0,72,600;1,72,500&family=Permanent+Marker&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FFFFFF;
+    --paper-dim:#F4F4F1;
+    --ink:#22314A;
+    --ink-soft:#5B6478;
+    --tab-red:#2F7FB8;
+    --tab-red-dark:#235F8C;
+    --folder-green:#5C9C36;
+    --gold:#C9962C;
+    --line:#D8D2BF;
+    --white:#FBFAF6;
+    --display: 'Newsreader', serif;
+    --mono: 'Inter', sans-serif;
+    --body: 'Inter', sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  img,svg{display:block;max-width:100%;}
+  a{color:inherit;text-decoration:none;}
+  :focus-visible{outline:2px solid var(--tab-red);outline-offset:3px;}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px;}
+
+  /* --- tab shape, the signature device --- */
+  .tab{
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 18px 8px;
+    clip-path: polygon(0 0, 100% 0, 92% 100%, 8% 100%);
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    font-weight:600;
+  }
+  .tab-red{background:var(--tab-red);color:var(--white);}
+  .tab-green{background:var(--folder-green);color:var(--white);}
+  .tab-ink{background:var(--ink);color:var(--paper);}
+  .tab-outline{background:transparent;color:var(--ink-soft);border:1px solid var(--line);clip-path:none;border-radius:3px;}
+
+  /* --- nav --- */
+  .nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;max-width:1120px;margin:0 auto;}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:19px;font-weight:600;color:var(--ink);}
+  .brand-mark{width:22px;height:22px;background:var(--tab-red);clip-path:polygon(0 0,100% 0,88% 100%,12% 100%);flex:none;}
+  .nav-links{display:flex;gap:28px;font-size:14px;font-weight:500;color:var(--ink-soft);}
+  .nav-links a:hover{color:var(--ink);}
+  .nav-cta{display:flex;gap:12px;align-items:center;}
+  @media (max-width:760px){.nav-links{display:none;}}
+
+  .btn{
+    font-family:var(--body);
+    font-weight:600;
+    font-size:14px;
+    padding:11px 22px;
+    border-radius:3px;
+    border:1px solid transparent;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+  }
+  .btn-primary{background:var(--tab-red);color:var(--white);}
+  .btn-primary:hover{background:var(--tab-red-dark);}
+  .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line);}
+  .btn-ghost:hover{border-color:var(--ink);}
+
+  /* --- hero --- */
+  .hero{padding:88px 0 64px;}
+  .hero-inner{display:grid;grid-template-columns:1.3fr .8fr;gap:44px;align-items:center;}
+  @media (max-width:980px){.hero-inner{grid-template-columns:1fr;}.roster-panel{margin:0 auto;}}
+  .eyebrow{margin-bottom:22px;}
+  .hero-title{
+    font-family:var(--display);
+    font-size:clamp(34px,5vw,54px);
+    font-weight:600;
+    line-height:1.08;
+    letter-spacing:-.01em;
+    color:var(--ink);
+    margin-bottom:22px;
+  }
+  .hero-title em{font-style:italic;color:var(--tab-red);font-weight:500;}
+  .hero-sub{font-size:17px;color:var(--ink-soft);max-width:480px;margin-bottom:32px;}
+  .hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:30px;}
+  .hero-fine{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);letter-spacing:.03em;}
+  .hero-title-long{font-size:clamp(28px,3.6vw,42px);line-height:1.2;}
+  .hero-sub-tight{margin-top:-6px;}
+  .cycle-word{
+    display:inline-block;
+    margin-left:5px;
+    font-style:italic;
+    font-weight:500;
+    color:var(--folder-green);
+    transition:opacity .28s ease, transform .28s ease;
+  }
+  .cycle-word.cw-out{opacity:0;transform:translateY(8px);}
+  .run-word{display:inline-block;transition:color .1s ease;}
+  .run-word.settled{
+    color:var(--folder-green);
+    text-transform:uppercase;
+    font-family:'Permanent Marker', cursive;
+    font-weight:400;
+    letter-spacing:.02em;
+  }
+  .run-word.write-in{
+    animation:writeReveal .9s ease forwards;
+  }
+  @keyframes writeReveal{
+    from{clip-path:inset(0 100% 0 0);}
+    to{clip-path:inset(0 0 0 0);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .run-word.write-in{animation:none;clip-path:none;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .cycle-word{transition:none;}
+  }
+
+  /* --- roster panel (signature visual) --- */
+  .roster-panel{
+    max-width:340px;
+    margin-left:auto;
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:6px;
+    box-shadow:0 22px 44px -18px rgba(34,49,74,.25);
+    overflow:hidden;
+    transform:rotate(1deg);
+  }
+  .roster-head{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 18px;border-bottom:1px solid var(--line);background:var(--paper-dim);
+  }
+  .roster-head-label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--ink-soft);text-transform:uppercase;}
+  .roster-head-date{font-family:var(--mono);font-size:11px;color:var(--ink-soft);}
+  .roster-rows{padding:6px 0;}
+  .roster-row{
+    display:grid;grid-template-columns:28px 1fr auto;gap:14px;align-items:center;
+    padding:11px 18px;border-bottom:1px solid var(--paper-dim);
+    opacity:0;animation:rowIn .45s ease forwards;
+  }
+  .roster-row:last-child{border-bottom:none;}
+  .roster-row:nth-child(1){animation-delay:.15s;}
+  .roster-row:nth-child(2){animation-delay:.35s;}
+  .roster-row:nth-child(3){animation-delay:.55s;}
+  .roster-row:nth-child(4){animation-delay:.75s;}
+  .roster-row:nth-child(5){animation-delay:.95s;}
+  @keyframes rowIn{from{opacity:0;transform:translateX(-6px);}to{opacity:1;transform:translateX(0);}}
+  .roster-check{
+    width:20px;height:20px;border-radius:50%;background:var(--folder-green);
+    display:flex;align-items:center;justify-content:center;flex:none;
+  }
+  .roster-check svg{width:11px;height:11px;}
+  .roster-name{font-size:13.5px;font-weight:500;}
+  .roster-class{font-family:var(--mono);font-size:11px;color:var(--ink-soft);}
+  @media (prefers-reduced-motion: reduce){
+    .roster-row{animation:none;opacity:1;}
+  }
+
+  /* --- outcomes strip --- */
+  .outcomes{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--paper-dim);}
+  .outcomes-list{display:flex;flex-wrap:wrap;}
+  .outcome-item{
+    flex:1 1 190px;padding:26px 24px;border-right:1px solid var(--line);
+  }
+  .outcome-item:last-child{border-right:none;}
+  .outcome-label{font-family:var(--display);font-style:italic;font-size:18px;font-weight:500;color:var(--tab-red);margin-bottom:6px;}
+  .outcome-desc{font-size:13px;color:var(--ink-soft);}
+
+  /* --- section shells --- */
+  .section{padding:88px 0;}
+  .section-head{max-width:600px;margin-bottom:52px;}
+  .section-eyebrow{margin-bottom:16px;}
+  .section-title{font-family:var(--display);font-size:clamp(26px,3.4vw,36px);font-weight:600;letter-spacing:-.01em;}
+  .section-title em{font-style:italic;color:var(--tab-red);font-weight:500;}
+
+  /* --- feature grid --- */
+  .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);}
+  @media (max-width:860px){.features-grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:560px){.features-grid{grid-template-columns:1fr;}}
+  .feature-card{background:var(--white);padding:26px 24px 28px;transition:background .15s;}
+  .feature-card:hover{background:var(--paper-dim);}
+  .feature-tab{margin-bottom:16px;}
+  .feature-title{font-family:var(--display);font-size:19px;font-weight:600;margin-bottom:8px;}
+  .feature-desc{font-size:14px;color:var(--ink-soft);line-height:1.55;}
+
+  /* --- unique list --- */
+  .unique-section{background:var(--ink);color:var(--paper);}
+  .unique-section .section-title,.unique-section .section-eyebrow .tab-outline{color:var(--paper);}
+  .unique-section .section-title em{color:var(--gold);}
+  .unique-section .section-eyebrow .tab-outline{border-color:rgba(241,238,226,.3);}
+  .unique-list{display:flex;flex-direction:column;}
+  .unique-item{
+    display:grid;grid-template-columns:200px 1fr;gap:28px;padding:22px 0;
+    border-top:1px solid rgba(241,238,226,.14);
+  }
+  @media (max-width:700px){.unique-item{grid-template-columns:1fr;gap:8px;}}
+  .unique-name{font-family:var(--display);font-size:17px;font-weight:600;color:var(--gold);}
+  .unique-desc{font-size:14.5px;color:rgba(241,238,226,.78);max-width:560px;}
+
+  /* --- pricing --- */
+  .pricing-toggle{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:48px;}
+  .toggle-label{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);}
+  .toggle-label.active{color:var(--ink);font-weight:600;}
+  .toggle-switch{
+    width:46px;height:24px;border-radius:12px;background:var(--ink);position:relative;cursor:pointer;border:none;flex:none;
+  }
+  .toggle-switch::after{
+    content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--paper);
+    transition:transform .18s ease;
+  }
+  .toggle-switch.on::after{transform:translateX(22px);}
+  .price-note-annual{font-family:var(--mono);font-size:11px;color:var(--folder-green);}
+
+  .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  @media (max-width:860px){.pricing-grid{grid-template-columns:1fr;max-width:420px;margin:0 auto;}}
+  .price-card{background:var(--white);border:1px solid var(--line);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;}
+  .price-card.is-pro{border-color:var(--tab-red);box-shadow:0 18px 36px -18px rgba(47,127,184,.35);}
+  .price-tab-row{padding:0;}
+  .price-body{padding:26px 26px 30px;flex:1;display:flex;flex-direction:column;}
+  .price-name{font-family:var(--display);font-size:21px;font-weight:600;margin-top:16px;margin-bottom:4px;}
+  .price-range{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;margin-bottom:20px;}
+  .price-amount{font-family:var(--display);font-size:38px;font-weight:600;display:flex;align-items:baseline;gap:6px;}
+  .price-amount .per{font-family:var(--body);font-size:13px;color:var(--ink-soft);font-weight:500;}
+  .price-annual-note{font-size:12px;color:var(--ink-soft);margin-top:6px;margin-bottom:22px;min-height:16px;}
+  .price-features{list-style:none;font-size:13.5px;color:var(--ink-soft);flex:1;margin-bottom:24px;}
+  .price-features li{padding:7px 0;border-top:1px solid var(--paper-dim);display:flex;gap:9px;}
+  .price-features li:first-child{border-top:none;}
+  .price-check{color:var(--folder-green);font-weight:700;flex:none;}
+  .price-cta{width:100%;justify-content:center;}
+
+  /* --- cta band --- */
+  .cta-band{background:var(--ink);color:var(--white);padding:76px 0;text-align:center;}
+  .cta-title{font-family:var(--display);font-size:clamp(26px,4vw,38px);font-weight:600;margin-bottom:14px;}
+  .cta-title em{font-style:italic;color:var(--gold);}
+  .cta-sub{font-size:15px;color:rgba(251,250,246,.85);margin-bottom:30px;}
+  .cta-band .btn-primary{background:var(--white);color:var(--ink);}
+  .cta-band .btn-primary:hover{background:var(--gold);color:var(--ink);}
+  .cta-band .btn-ghost{border-color:rgba(251,250,246,.4);color:var(--white);}
+
+  /* --- footer --- */
+  .footer{padding:44px 0 40px;border-top:1px solid var(--line);}
+  .footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+  .footer-brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:16px;font-weight:600;}
+  .footer-meta{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);}
+  .footer-tagline{font-size:12.5px;color:var(--ink-soft);margin-top:5px;max-width:300px;}
+  .footer-links{display:flex;gap:22px;font-size:13px;color:var(--ink-soft);}
+  .footer-links a:hover{color:var(--ink);}
+</style>
 </head>
 <body>
-  <h1>Hello World</h1>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="brand"><span class="brand-mark"></span>Seed Scheduler</div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#unique">What's different</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+    <div class="nav-cta">
+      <a href="#pricing" class="btn btn-ghost">Pricing</a>
+      <a href="mailto:admin@seedscheduler.com" class="btn btn-primary">Get started</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-inner">
+    <div>
+      <div class="eyebrow"><span class="tab tab-red">For homeschool co-ops</span></div>
+      <h1 class="hero-title hero-title-long">Everything a homeschool co-op needs to <span class="run-word" id="runWord">run</span><em class="cycle-word" id="cycleWord"> registration</em>.</h1>
+      <p class="hero-sub hero-sub-tight">Classes, volunteers, attendance, and parent communication — all in one place.</p>
+      <div class="hero-actions">
+        <a href="mailto:admin@seedscheduler.com" class="btn btn-primary">Get started free</a>
+        <a href="#features" class="btn btn-ghost">See what it does</a>
+      </div>
+      <div class="hero-fine">FREE FOR CO-OPS UNDER 20 FAMILIES · NO CREDIT CARD TO START</div>
+    </div>
+    <div class="roster-panel" aria-hidden="true">
+      <div class="roster-head">
+        <span class="roster-head-label">Live Board — Co-op Day</span>
+        <span class="roster-head-date">Period 3</span>
+      </div>
+      <div class="roster-rows">
+        <div class="roster-row"><div class="roster-check"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M4 12l5 5L20 6"/></svg></div><div><div class="roster-name">Avery M.</div><div class="roster-class">Botany Lab — Rm 4</div></div><div class="roster-class">8:58a</div></div>
+        <div class="roster-row"><div class="roster-check"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M4 12l5 5L20 6"/></svg></div><div><div class="roster-name">Jonah K.</div><div class="roster-class">World History — Rm 1</div></div><div class="roster-class">8:59a</div></div>
+        <div class="roster-row"><div class="roster-check"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M4 12l5 5L20 6"/></svg></div><div><div class="roster-name">Ruth D.</div><div class="roster-class">Art Studio — Rm 6</div></div><div class="roster-class">9:01a</div></div>
+        <div class="roster-row"><div class="roster-check"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M4 12l5 5L20 6"/></svg></div><div><div class="roster-name">Silas P.</div><div class="roster-class">Botany Lab — Rm 4</div></div><div class="roster-class">9:02a</div></div>
+        <div class="roster-row"><div class="roster-check"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M4 12l5 5L20 6"/></svg></div><div><div class="roster-name">Nora T.</div><div class="roster-class">World History — Rm 1</div></div><div class="roster-class">9:03a</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="outcomes">
+  <div class="wrap outcomes-list">
+    <div class="outcome-item"><div class="outcome-label">Less scheduling</div><div class="outcome-desc">Build the term once. Conflicts get caught before co-op day, not during it.</div></div>
+    <div class="outcome-item"><div class="outcome-label">Fewer emails</div><div class="outcome-desc">Schedules, documents, and announcements live where parents already look.</div></div>
+    <div class="outcome-item"><div class="outcome-label">Lighter admin load</div><div class="outcome-desc">Registration, fees, and waivers run themselves in the background.</div></div>
+    <div class="outcome-item"><div class="outcome-label">Clearer communication</div><div class="outcome-desc">One portal, one inbox, one source of truth for every family.</div></div>
+    <div class="outcome-item"><div class="outcome-label">More time saved</div><div class="outcome-desc">The parts that used to take a weekend now take an afternoon.</div></div>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow"><span class="tab tab-outline">Core features</span></div>
+      <h2 class="section-title">Built around <em>co-op day itself.</em></h2>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-tab"><span class="tab tab-green">Scheduling</span></div>
+        <div class="feature-title">Schedule Builder</div>
+        <p class="feature-desc">Drag classes into periods, assign rooms and roles, and catch conflicts before co-op day starts — not during it.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-tab"><span class="tab tab-green">Registration</span></div>
+        <div class="feature-title">Registration System</div>
+        <p class="feature-desc">Parents pick classes for each child with an invite code, on a staggered opening schedule, with waitlists that fill themselves.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-tab"><span class="tab tab-green">Attendance</span></div>
+        <div class="feature-title">Attendance & Check-In</div>
+        <p class="feature-desc">QR check-in, printed nametags, and late-arrival tracking, with attendance history you can actually look back on.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-tab"><span class="tab tab-red">Money</span></div>
+        <div class="feature-title">Finance Tracking</div>
+        <p class="feature-desc">Assign fees, track payments, manage supply costs, and export to QuickBooks or MoneyMinder when it's time to reconcile.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-tab"><span class="tab tab-red">Parent Portal</span></div>
+        <div class="feature-title">Parent Portal</div>
+        <p class="feature-desc">Schedules, children, cleaning duties, documents, calendar, announcements, and messaging — all in one login.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-tab"><span class="tab tab-ink">Compliance</span></div>
+        <div class="feature-title">Digital Waivers</div>
+        <p class="feature-desc">Agreements are signed once per cycle, access is gated until they are, and re-enrollment resets automatically.</p>
+      </div>
+    </div>
+    <div style="margin-top:1px;background:var(--line);border:1px solid var(--line);border-top:none;">
+      <div class="feature-card" style="max-width:100%;">
+        <div class="feature-tab"><span class="tab tab-ink">Safety</span></div>
+        <div class="feature-title">Background Checks</div>
+        <p class="feature-desc">Checkr-verified background checks for every volunteer, billed straight through to the family — no separate invoicing on your end.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section unique-section" id="unique">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow"><span class="tab tab-outline">Not on any other roster app</span></div>
+      <h2 class="section-title">The parts <em>your co-op</em> actually needed.</h2>
+    </div>
+    <div class="unique-list">
+      <div class="unique-item">
+        <div class="unique-name">CBT Training Modules</div>
+        <div class="unique-desc">Assign training videos or documents to specific parents, track who's finished, and let automatic reminders chase the stragglers at 7 and 3 days out.</div>
+      </div>
+      <div class="unique-item">
+        <div class="unique-name">Rotating Cleaning Duties</div>
+        <div class="unique-desc">Team A/Team B cleaning tied to your real co-op calendar, with an interactive parent checklist and supervisor sign-off.</div>
+      </div>
+      <div class="unique-item">
+        <div class="unique-name">Swap Marketplace</div>
+        <div class="unique-desc">A buy/sell/swap board just for your co-op families, built right into the parent portal they already use.</div>
+      </div>
+      <div class="unique-item">
+        <div class="unique-name">Live Board</div>
+        <div class="unique-desc">A real-time front-desk view of who's checked in, period by period — built for whoever's running the door.</div>
+      </div>
+      <div class="unique-item">
+        <div class="unique-name">Summer Break Billing Pause</div>
+        <div class="unique-desc">Pause your subscription for up to three months over summer, drop to Free automatically, and resume Pro when the year starts.</div>
+      </div>
+      <div class="unique-item">
+        <div class="unique-name">Badge System</div>
+        <div class="unique-desc">Attendance streaks, teaching hours, cleaning completions — small wins parents notice, with confetti when they unlock one.</div>
+      </div>
+      <div class="unique-item">
+        <div class="unique-name">Pre-Registration Deposits</div>
+        <div class="unique-desc">Interested families can reserve a spot with a deposit before registration even opens, all inside the app.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="pricing">
+  <div class="wrap">
+    <div class="section-head" style="margin:0 auto 40px;text-align:center;">
+      <div class="section-eyebrow" style="display:flex;justify-content:center;"><span class="tab tab-outline">Pricing</span></div>
+      <h2 class="section-title">Priced for <em>where you are now.</em></h2>
+    </div>
+    <div class="pricing-toggle">
+      <span class="toggle-label active" id="labelMonthly">Monthly</span>
+      <button class="toggle-switch" id="billingToggle" aria-label="Toggle annual billing" aria-pressed="false"></button>
+      <span class="toggle-label" id="labelAnnual">Annual <span class="price-note-annual">(3-month break included)</span></span>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-tab-row"><span class="tab tab-green" style="border-radius:0 0 4px 0;">Standard</span></div>
+        <div class="price-body">
+          <div class="price-name">Free</div>
+          <div class="price-range">Under 20 families</div>
+          <div class="price-amount">$0</div>
+          <div class="price-annual-note">&nbsp;</div>
+          <ul class="price-features">
+            <li><span class="price-check">✓</span>Schedule builder</li>
+            <li><span class="price-check">✓</span>Basic check-in</li>
+            <li><span class="price-check">✓</span>Member roster & directory</li>
+            <li><span class="price-check">✓</span>Parent portal (schedule, children, profile)</li>
+            <li><span class="price-check">✓</span>Announcements, rooms, bell schedule</li>
+          </ul>
+          <a href="mailto:admin@seedscheduler.com" class="btn btn-ghost price-cta">Start free</a>
+        </div>
+      </div>
+
+      <div class="price-card is-pro">
+        <div class="price-tab-row"><span class="tab tab-red" style="border-radius:0 0 4px 0;">Pro</span></div>
+        <div class="price-body">
+          <div class="price-name">Pro</div>
+          <div class="price-range">20–79 families</div>
+          <div class="price-amount" data-monthly="$20" data-annual="$200">$20<span class="per">/mo</span></div>
+          <div class="price-annual-note" data-monthly-note=" " data-annual-note="Billed annually · 3-month break included">&nbsp;</div>
+          <ul class="price-features">
+            <li><span class="price-check">✓</span>Everything in Standard</li>
+            <li><span class="price-check">✓</span>Waitlist & bulk messaging</li>
+            <li><span class="price-check">✓</span>Attendance analytics</li>
+            <li><span class="price-check">✓</span>Swap marketplace</li>
+            <li><span class="price-check">✓</span>Up to 4 admins</li>
+            <li><span class="price-check">✓</span>Digital waivers & audit log</li>
+            <li><span class="price-check">✓</span>Live schedule board</li>
+            <li><span class="price-check">✓</span>CBT training modules</li>
+            <li><span class="price-check">✓</span>Finance tracking</li>
+            <li><span class="price-check">✓</span>Registration staggering</li>
+            <li><span class="price-check">✓</span>Pre-registration with deposits</li>
+            <li><span class="price-check">✓</span>Checkr background checks</li>
+            <li><span class="price-check">✓</span>Semester reports & rollover</li>
+          </ul>
+          <a href="mailto:admin@seedscheduler.com" class="btn btn-primary price-cta">Start Pro</a>
+        </div>
+      </div>
+
+      <div class="price-card">
+        <div class="price-tab-row"><span class="tab tab-ink" style="border-radius:0 0 4px 0;">Pro Plus</span></div>
+        <div class="price-body">
+          <div class="price-name">Pro Plus</div>
+          <div class="price-range">80+ families</div>
+          <div class="price-amount" data-monthly="$40" data-annual="$440">$40<span class="per">/mo</span></div>
+          <div class="price-annual-note" data-monthly-note=" " data-annual-note="Billed annually · 3-month break included">&nbsp;</div>
+          <ul class="price-features">
+            <li><span class="price-check">✓</span>Everything in Pro</li>
+            <li><span class="price-check">✓</span>Built for larger co-ops</li>
+            <li><span class="price-check">✓</span>Room to grow past 80 families</li>
+          </ul>
+          <a href="mailto:admin@seedscheduler.com" class="btn btn-ghost price-cta">Start Pro Plus</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap">
+    <h2 class="cta-title">Run your next co-op day <em>without the group chat.</em></h2>
+    <p class="cta-sub">Free to start under 20 families. No credit card required.</p>
+    <div class="hero-actions" style="justify-content:center;">
+      <a href="mailto:admin@seedscheduler.com" class="btn btn-primary">Get started free</a>
+      <a href="#features" class="btn btn-ghost">Explore features</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <div>
+      <div class="footer-brand"><span class="brand-mark"></span>Seed Scheduler</div>
+      <div class="footer-tagline">Made by a co-op leader with the knowledge of how a co-op actually functions.</div>
+    </div>
+    <div class="footer-links">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="mailto:admin@seedscheduler.com">Contact</a>
+    </div>
+    <div class="footer-meta">© 2026 Seed Scheduler</div>
+  </div>
+</footer>
+
+<script>
+  var toggle = document.getElementById('billingToggle');
+  var labelM = document.getElementById('labelMonthly');
+  var labelA = document.getElementById('labelAnnual');
+  var amounts = document.querySelectorAll('.price-amount[data-monthly]');
+  var notes = document.querySelectorAll('.price-annual-note[data-monthly-note]');
+  var annual = false;
+
+  toggle.addEventListener('click', function(){
+    annual = !annual;
+    toggle.classList.toggle('on', annual);
+    toggle.setAttribute('aria-pressed', annual);
+    labelM.classList.toggle('active', !annual);
+    labelA.classList.toggle('active', annual);
+
+    amounts.forEach(function(el){
+      var val = annual ? el.getAttribute('data-annual') : el.getAttribute('data-monthly');
+      var suffix = annual ? '/yr' : '/mo';
+      el.innerHTML = val + '<span class="per">' + suffix + '</span>';
+    });
+    notes.forEach(function(el){
+      el.textContent = annual ? el.getAttribute('data-annual-note') : el.getAttribute('data-monthly-note');
+    });
+  });  var cycleEl = document.getElementById('cycleWord');
+  var cycleWords = [' registration',' classes',' volunteers',' attendance',' communication'];
+  var cycleIdx = 0;
+  var HOLD_MS = 1150, FADE_MS = 280;
+
+  function prefersReducedMotion(){
+    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  function cycleStep(){
+    cycleEl.classList.add('cw-out');
+    setTimeout(function(){
+      cycleIdx++;
+      if(cycleIdx >= cycleWords.length){
+        cycleEl.textContent = '';
+        cycleEl.classList.remove('cw-out');
+        var runEl = document.getElementById('runWord');
+        if(runEl){ runEl.classList.add('settled', 'write-in'); }
+        return; // settled on "RUN." — animation ends here
+      }
+      cycleEl.textContent = cycleWords[cycleIdx];
+      cycleEl.classList.remove('cw-out');
+      setTimeout(cycleStep, HOLD_MS);
+    }, FADE_MS);
+  }
+
+  if(cycleEl){
+    if(prefersReducedMotion()){
+      cycleEl.textContent = '';
+      var runElStatic = document.getElementById('runWord');
+      if(runElStatic){ runElStatic.classList.add('settled'); }
+    } else {
+      cycleEl.textContent = cycleWords[0];
+      setTimeout(cycleStep, HOLD_MS);
+    }
+  }
+</script>
+
 </body>
 </html>
