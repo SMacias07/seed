@@ -106,7 +106,7 @@
   .hero-sub-tight{margin-top:-6px;}
   .cycle-word{
     display:inline-block;
-    margin-left:5px;
+    margin-left:12px;
     font-style:italic;
     font-weight:500;
     color:var(--folder-green);
@@ -537,12 +537,20 @@
       el.textContent = annual ? el.getAttribute('data-annual-note') : el.getAttribute('data-monthly-note');
     });
   });  var cycleEl = document.getElementById('cycleWord');
+  var runEl = document.getElementById('runWord');
   var cycleWords = [' registration',' classes',' volunteers',' attendance',' communication'];
   var cycleIdx = 0;
-  var HOLD_MS = 1150, FADE_MS = 280;
+  var HOLD_MS = 1150, FADE_MS = 280, PAUSE_MS = 3000;
 
   function prefersReducedMotion(){
     return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  function startCycle(){
+    cycleIdx = 0;
+    cycleEl.classList.remove('cw-out');
+    cycleEl.textContent = cycleWords[0];
+    setTimeout(cycleStep, HOLD_MS);
   }
 
   function cycleStep(){
@@ -552,9 +560,12 @@
       if(cycleIdx >= cycleWords.length){
         cycleEl.textContent = '';
         cycleEl.classList.remove('cw-out');
-        var runEl = document.getElementById('runWord');
         if(runEl){ runEl.classList.add('settled', 'write-in'); }
-        return; // settled on "RUN." — animation ends here
+        setTimeout(function(){
+          if(runEl){ runEl.classList.remove('settled', 'write-in'); }
+          startCycle();
+        }, PAUSE_MS);
+        return;
       }
       cycleEl.textContent = cycleWords[cycleIdx];
       cycleEl.classList.remove('cw-out');
@@ -565,11 +576,9 @@
   if(cycleEl){
     if(prefersReducedMotion()){
       cycleEl.textContent = '';
-      var runElStatic = document.getElementById('runWord');
-      if(runElStatic){ runElStatic.classList.add('settled'); }
+      if(runEl){ runEl.classList.add('settled'); }
     } else {
-      cycleEl.textContent = cycleWords[0];
-      setTimeout(cycleStep, HOLD_MS);
+      startCycle();
     }
   }
 </script>
