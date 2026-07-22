@@ -61,7 +61,7 @@
   .nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);}
   .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;max-width:1120px;margin:0 auto;}
   .brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:19px;font-weight:600;color:var(--ink);}
-  .brand-mark{width:22px;height:22px;background:var(--tab-red);clip-path:polygon(0 0,100% 0,88% 100%,12% 100%);flex:none;}
+  .brand-mark{height:24px;width:auto;flex:none;display:block;}
   .nav-links{display:flex;gap:28px;font-size:14px;font-weight:500;color:var(--ink-soft);}
   .nav-links a:hover{color:var(--ink);}
   .nav-cta{display:flex;gap:12px;align-items:center;}
@@ -290,7 +290,7 @@
 
 <nav class="nav">
   <div class="nav-inner">
-    <div class="brand"><span class="brand-mark"></span>Seed Scheduler</div>
+    <div class="brand"><img src="images/logo.png" class="brand-mark" alt="Seed Scheduler logo">Seed Scheduler</div>
     <div class="nav-links">
       <a href="#features">Features</a>
       <a href="#unique">What's different</a>
@@ -539,12 +539,13 @@
 <footer class="footer">
   <div class="wrap footer-inner">
     <div>
-      <div class="footer-brand"><span class="brand-mark"></span>Seed Scheduler</div>
+      <div class="footer-brand"><img src="images/logo.png" class="brand-mark" alt="Seed Scheduler logo">Seed Scheduler</div>
       <div class="footer-tagline">Made by a co-op leader with the knowledge of how a co-op actually functions.</div>
     </div>
     <div class="footer-links">
       <a href="#features">Features</a>
       <a href="#pricing">Pricing</a>
+      <a href="/privacy">Privacy</a>
       <a href="mailto:admin@seedscheduler.com">Contact</a>
     </div>
     <div class="footer-meta">© 2026 Seed Scheduler</div>
